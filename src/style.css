@@ -156,7 +156,7 @@ button:hover { background: var(--primary); color: var(--bg); box-shadow: 0 0 12p
   * { animation: none !important; }
 }
 
-
+/* ========= Rain ========= */
 .matrix-canvas {
   position: fixed;
   top: 0;
