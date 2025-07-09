@@ -151,32 +151,49 @@ function glitchLoop() {
 // Start glitch loop
 glitchLoop();
 
-/* ====== Typing Handler ====== */
+/* ====== Typing + Submit-on-Enter ====== */
 document.addEventListener("keydown", (e) => {
+  // ----- Handle Enter -----
+  if (e.key === "Enter") {
+    if (typedChars === accessWord) {
+      // Success: fade + redirect
+      document.body.style.transition = "opacity 1.5s ease";
+      document.body.style.opacity = "0";
+      setTimeout(() => (window.location.href = "/granted.html"), 1600);
+    } else {
+      // Optional: clear and give visual feedback for wrong submit
+      typedChars = "";
+      spanElems.forEach((span) => {
+        if (span.dataset.glitchKey === "typed") {
+          span.dataset.glitchKey = "";
+          span.style.color = "";
+          span.textContent = span.dataset.char === " " ? " " : span.dataset.char!;
+        }
+      });
+    }
+    return; // Don't process Enter as a letter
+  }
+
+  // ----- Handle A‑Z letters -----
   const key = e.key.toUpperCase();
-  if (!/^[A-Z]$/.test(key)) return;
+  if (!/^[A-Z]$/.test(key)) return; // ignore non‑letters
+
+  if (typedChars.length >= accessWord.length) return; // prevent overflow
 
   const expectedChar = accessWord[typedChars.length];
-  if (key !== expectedChar) return;
+  if (key !== expectedChar) return; // wrong letter => ignore
 
+  // Correct letter
   typedChars += key;
 
   const target = Array.from(spanElems).find(
-    (span) =>
-      span.dataset.char?.toUpperCase() === expectedChar &&
-      span.dataset.glitchKey !== "typed"
+    (span) => span.dataset.char?.toUpperCase() === expectedChar && span.dataset.glitchKey !== "typed"
   );
 
   if (target) {
     target.textContent = expectedChar;
     target.style.color = "#0f0";
     target.dataset.glitchKey = "typed";
-  }
-
-  if (typedChars === accessWord) {
-    document.body.style.transition = "opacity 1.5s ease";
-    document.body.style.opacity = "0";
-    setTimeout(() => (window.location.href = "/granted.html"), 1600);
   }
 });
 
