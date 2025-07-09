@@ -1,0 +1,193 @@
+/* ========== Variables ========== */
+:root {
+  --bg: #000000;
+  --text: rgb(90, 117, 83);
+  --primary: rgb(0, 0, 0);
+  --font: 'Courier New', monospace;
+  --ascii-size: clamp(0.5rem, 1vw, 1rem);
+  --blur-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+}
+
+/* ========== Base Reset & Theme ========== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+}
+
+/* ========== Effects ========== */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.05) 0 2px,
+    transparent 2px 4px
+  );
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0) 30%,
+    rgba(0, 0, 0, 0.4) 75%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  filter: blur(2px);
+  opacity: 0.5;
+}
+
+@keyframes flicker-global {
+  0%, 100% { opacity: 1; }
+  12% { opacity: 0.95; }
+  18% { opacity: 0.65; }
+  22% { opacity: 0.85; }
+  36% { opacity: 0.7; }
+  50% { opacity: 0.98; }
+  62% { opacity: 0.6; }
+  85% { opacity: 0.92; }
+}
+
+@keyframes drift {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(15px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes huePulse {
+  0% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(30deg); }
+  100% { filter: hue-rotate(0deg); }
+}
+
+.shared-animation {
+  animation:
+    drift 1.5s ease-in-out infinite,
+    flicker-global 1.5s infinite,
+    huePulse 5s infinite;
+}
+
+/* ========== Layout ========== */
+.centered-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 2rem 1rem;
+  gap: 2rem;
+  position: relative;
+  z-index: 2; /* raised above ::after overlay */
+}
+
+/* ========== ASCII ========== */
+.ascii-wrapper {
+  width: 100%;
+  min-height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  isolation: isolate;
+}
+
+.ascii-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+pre.ascii {
+  font-size: var(--ascii-size);
+  line-height: 1.1;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 1rem;
+  white-space: pre;
+  overflow-x: auto;
+  max-width: 100%;
+  letter-spacing: -0.05em;
+  text-shadow: 0 0 0.1em rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 480px) {
+  pre.ascii {
+    font-size: 0.28rem;
+    letter-spacing: -0.1em;
+  }
+}
+
+/* ========== Terminal ========== */
+.terminal {
+  background: rgba(0, 0, 0, 0.1);
+  border: 0.25rem solid currentColor;
+  border-radius: 1.25rem;
+  padding: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  max-width: 90vw;
+  margin: 0 auto;
+  overflow-y: hidden;
+  font-size: var(--ascii-size);
+  transition: color 0.3s ease, border-color 0.3s ease;
+  box-shadow: var(--blur-shadow);
+  backdrop-filter: blur(4px);
+}
+
+/* ========== Input ========== */
+#code-input {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+  width: 100%;
+  min-width: 8ch;
+  max-width: 12ch;
+  line-height: 1;
+  padding-block: 0.1em;
+  text-shadow: inherit;
+}
+
+/* ========== Buttons ========== */
+button {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  padding: 0.75rem 1.5rem;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background: var(--primary);
+  color: var(--bg);
+  box-shadow: 0 0 12px var(--primary);
+}
