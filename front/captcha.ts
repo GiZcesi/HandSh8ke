@@ -156,9 +156,19 @@ function handleDelete() {
 
 function handleSubmit() {
   if (inputBuffer === accessCode) {
+    // 1. Generate and store a short-lived session token
+    const sessionToken = crypto.randomUUID();
+    sessionStorage.setItem("auth_token", sessionToken);
+    sessionStorage.setItem("last_activity", Date.now().toString());
+
+    // 2. Animate fade-out
     document.body.style.transition = "opacity 1.5s ease";
     document.body.style.opacity = "0";
-    setTimeout(() => (window.location.href = "/granted.html"), 1600);
+
+    // 3. After transition, navigate to protected page
+    setTimeout(() => {
+      window.location.href = "/granted.html";
+    }, 1600);
   }
 }
 
