@@ -3,7 +3,7 @@
   /* Colors */
   --bg: #000;
   --surface: rgba(0 0 0 / 0.12);
-  --text: hsl(110 18% 45%);
+  --text: hsl(274, 42%, 40%);
   --primary: #00ff90;
 
   /* Typography (original scale) */
@@ -25,6 +25,7 @@
 /* ========= Base Reset ========= */
 *, *::before, *::after { box-sizing: border-box; }
 html, body {
+  font-size: clamp(1.125rem, 1.2vw + 1rem, 1.375rem); /* 18px DEFINE THE BASE FONT SIZE BECAUSE EVERYTHING IS ASCII */
   height: 100%;
   margin: 0;
   font-family: var(--font-family);
