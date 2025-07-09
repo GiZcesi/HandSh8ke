@@ -1,92 +1,66 @@
-/* ========== Variables ========== */
+/* ========= Design Tokens ========= */
 :root {
-  --bg: #000000;
-  --text: rgb(90, 117, 83);
-  --primary: rgb(0, 0, 0);
-  --font: 'Courier New', monospace;
-  --ascii-size: clamp(0.5rem, 1vw, 1rem);
-  --blur-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+  /* Colors */
+  --bg: #000;
+  --surface: rgba(0 0 0 / 0.12);
+  --text: hsl(110 18% 45%);
+  --primary: #00ff90;
+
+  /* Typography (original scale) */
+  --font-family: 'Courier New', monospace;
+  --fs-xs: clamp(0.5rem, 0.2vw + 0.4rem, 0.65rem);
+  --fs-sm: clamp(0.8rem, 0.6vw + 0.6rem, 0.95rem);
+  --fs-md: clamp(1rem, 1vw + 0.8rem, 1.25rem);
+
+  /* Spacing */
+  --space-xs: clamp(0.25rem, 0.3vw, 0.5rem);
+  --space-sm: clamp(0.5rem, 0.6vw, 0.75rem);
+  --space-md: clamp(1rem, 1vw, 1.5rem);
+
+  /* Radii & shades */
+  --radius: 1.25rem;
+  --shadow-blur: 0 0 12px rgb(255 255 255 / 0.1);
 }
 
-/* ========== Base Reset & Theme ========== */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html,
-body {
+/* ========= Base Reset ========= */
+*, *::before, *::after { box-sizing: border-box; }
+html, body {
   height: 100%;
   margin: 0;
-  padding: 0;
-  overflow-x: hidden;
+  font-family: var(--font-family);
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font);
+  overflow-x: hidden;
 }
 
-/* ========== Effects ========== */
+/* ========= Background Effects ========= */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 0;
+  background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.05) 0 2px, transparent 2px 4px);
   pointer-events: none;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.05) 0 2px,
-    transparent 2px 4px
-  );
+  z-index: 0;
 }
-
 body::after {
   content: "";
   position: fixed;
   inset: 0;
+  background: radial-gradient(ellipse at center, rgb(0 0 0 / 0) 30%, rgb(0 0 0 / 0.4) 75%, rgb(0 0 0 / 0.7) 100%);
+  opacity: 0.5;
+  filter: blur(2px);
   pointer-events: none;
   z-index: 1;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0, 0, 0, 0) 30%,
-    rgba(0, 0, 0, 0.4) 75%,
-    rgba(0, 0, 0, 0.7) 100%
-  );
-  filter: blur(2px);
-  opacity: 0.5;
 }
 
-@keyframes flicker-global {
-  0%, 100% { opacity: 1; }
-  12% { opacity: 0.95; }
-  18% { opacity: 0.65; }
-  22% { opacity: 0.85; }
-  36% { opacity: 0.7; }
-  50% { opacity: 0.98; }
-  62% { opacity: 0.6; }
-  85% { opacity: 0.92; }
-}
+/* ========= Animations ========= */
+@keyframes drift { 0% { transform: translateY(0); } 50% { transform: translateY(15px); } 100% { transform: translateY(0); } }
+@keyframes flicker-global { 0%,100%{opacity:1;} 12%{opacity:.95;} 18%{opacity:.65;} 22%{opacity:.85;} 36%{opacity:.7;} 50%{opacity:.98;} 62%{opacity:.6;} 85%{opacity:.92;} }
+@keyframes huePulse { 0%{filter:hue-rotate(0deg);} 50%{filter:hue-rotate(30deg);} 100%{filter:hue-rotate(0deg);} }
 
-@keyframes drift {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(15px); }
-  100% { transform: translateY(0); }
-}
+.shared-animation{animation:drift 1.5s ease-in-out infinite, flicker-global 1.5s infinite, huePulse 5s infinite;}
 
-@keyframes huePulse {
-  0% { filter: hue-rotate(0deg); }
-  50% { filter: hue-rotate(30deg); }
-  100% { filter: hue-rotate(0deg); }
-}
-
-.shared-animation {
-  animation:
-    drift 1.5s ease-in-out infinite,
-    flicker-global 1.5s infinite,
-    huePulse 5s infinite;
-}
-
-/* ========== Layout ========== */
+/* ========= Layout ========= */
 .centered-layout {
   display: flex;
   flex-direction: column;
@@ -94,68 +68,59 @@ body::after {
   justify-content: center;
   min-height: 100vh;
   width: 100%;
-  padding: 2rem 1rem;
-  gap: 2rem;
+  padding: var(--space-md);
+  gap: var(--space-md);
   position: relative;
-  z-index: 2; /* raised above ::after overlay */
+  z-index: 2;
 }
 
-/* ========== ASCII ========== */
+/* ========= ASCII ========= */
 .ascii-wrapper {
   width: 100%;
   min-height: 200px;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
-  isolation: isolate;
 }
-
 .ascii-container {
   width: 100%;
   overflow-x: auto;
+  /* container query enables font to respond to its own width */
+  container-type: inline-size;
 }
-
 pre.ascii {
-  font-size: var(--ascii-size);
+  font-size: var(--fs-xs);
   line-height: 1.1;
   text-align: center;
-  margin-bottom: 0.5rem;
-  padding-bottom: 1rem;
-  white-space: pre;
-  overflow-x: auto;
-  max-width: 100%;
+  margin: 0 0 var(--space-xs);
+  padding-bottom: var(--space-sm);
   letter-spacing: -0.05em;
-  text-shadow: 0 0 0.1em rgba(0, 0, 0, 0.5);
+  text-shadow: 0 0 0.1em rgb(0 0 0 / 0.5);
+  white-space: pre;
+}
+@container (max-width: 360px) {
+  pre.ascii { font-size: 0.4rem; letter-spacing: -0.09em; }
 }
 
-@media (max-width: 480px) {
-  pre.ascii {
-    font-size: 0.28rem;
-    letter-spacing: -0.1em;
-  }
-}
-
-/* ========== Terminal ========== */
+/* ========= Terminal ========= */
 .terminal {
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--surface);
   border: 0.25rem solid currentColor;
-  border-radius: 1.25rem;
-  padding: 1rem;
+  border-radius: var(--radius);
+  padding: var(--space-sm);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  max-width: 90vw;
+  max-width: min(85ch, 90vw);
   margin: 0 auto;
-  overflow-y: hidden;
-  font-size: var(--ascii-size);
-  transition: color 0.3s ease, border-color 0.3s ease;
-  box-shadow: var(--blur-shadow);
+  font-size: var(--fs-sm);
+  box-shadow: var(--shadow-blur);
   backdrop-filter: blur(4px);
+  transition: color 0.3s, border-color 0.3s;
 }
 
-/* ========== Input ========== */
+/* ========= Input ========= */
 #code-input {
   background: transparent;
   border: none;
@@ -167,27 +132,25 @@ pre.ascii {
   min-width: 8ch;
   max-width: 12ch;
   line-height: 1;
-  padding-block: 0.1em;
-  text-shadow: inherit;
 }
 
-/* ========== Buttons ========== */
+/* ========= Buttons ========= */
 button {
   background: transparent;
   color: var(--primary);
   border: 1px solid var(--primary);
-  padding: 0.75rem 1.5rem;
+  padding: var(--space-sm) var(--space-md);
   font-family: inherit;
-  font-size: 1rem;
+  font-size: var(--fs-sm);
   cursor: pointer;
-  margin-top: 2rem;
+  margin-top: var(--space-md);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   transition: all 0.2s ease;
 }
+button:hover { background: var(--primary); color: var(--bg); box-shadow: 0 0 12px var(--primary); }
 
-button:hover {
-  background: var(--primary);
-  color: var(--bg);
-  box-shadow: 0 0 12px var(--primary);
+/* ========= Accessibility ========= */
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; }
 }
