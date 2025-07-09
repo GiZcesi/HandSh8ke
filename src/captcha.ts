@@ -7,6 +7,21 @@ const DISTANCE_THRESHOLD = 900;
 
 /* ====== DOM References ======*/
 const pre = document.getElementById("ascii-logo") as HTMLElement;
+document.addEventListener("mousemove", (e: MouseEvent) => {
+    // find the topmost element under the pointer
+    const hit = document.elementFromPoint(e.clientX, e.clientY);
+  
+    // if it’s one of our ASCII spans, hide; otherwise restore
+    if (
+      hit instanceof HTMLElement &&
+      hit.matches("#ascii-logo span[data-char]")
+    ) {
+      document.body.style.cursor = "none";
+    } else {
+      document.body.style.cursor = "";
+    }
+  });
+
 const wrapper = document.querySelector<HTMLElement>(".ascii-wrapper")!;
 
 /* ====== CAPTCHA ======*/
