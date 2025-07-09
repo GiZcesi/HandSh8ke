@@ -151,49 +151,72 @@ function glitchLoop() {
 // Start glitch loop
 glitchLoop();
 
-/* ====== Typing + Submit-on-Enter ====== */
+/* ====== helpers up top ====== */
+let pendingInvalid = 0;               // wrong keys since last correct one
+const typedHistory: HTMLElement[] = [];   // unchanged
+
 document.addEventListener("keydown", (e) => {
-  // ----- Handle Enter -----
+  /* ---- Disable browser / script reaction to Ctrl|Cmd + Z (and Shift+Ctrl|Cmd + Z) ---- */
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+    e.preventDefault();   // stops the browser’s Undo
+    return;               // stops your captcha logic
+  }
+  
+  /* ---------- 1. Backspace / Delete ---------- */
+  if (e.key === "Backspace" || e.key === "Delete") {
+    if (pendingInvalid > 0) {         // just cancel the stray key
+      pendingInvalid--;
+      return;
+    }
+    if (typedChars.length === 0) return;
+
+    // undo last correct char
+    typedChars = typedChars.slice(0, -1);
+    const span = typedHistory.pop();
+    if (span) {
+      span.dataset.glitchKey = "";
+      span.style.color = "";
+      span.textContent = span.dataset.char === " " ? " " : span.dataset.char!;
+    }
+    return;
+  }
+
+  /* ---------- 2. Enter (submit) ---------- */
   if (e.key === "Enter") {
     if (typedChars === accessWord) {
-      // Success: fade + redirect
       document.body.style.transition = "opacity 1.5s ease";
       document.body.style.opacity = "0";
       setTimeout(() => (window.location.href = "/granted.html"), 1600);
-    } else {
-      // Optional: clear and give visual feedback for wrong submit
-      typedChars = "";
-      spanElems.forEach((span) => {
-        if (span.dataset.glitchKey === "typed") {
-          span.dataset.glitchKey = "";
-          span.style.color = "";
-          span.textContent = span.dataset.char === " " ? " " : span.dataset.char!;
-        }
-      });
     }
-    return; // Don't process Enter as a letter
+    return;                           // no reset on wrong submit here
   }
 
-  // ----- Handle A‑Z letters -----
+  /* ---------- 3. A-Z letters ---------- */
   const key = e.key.toUpperCase();
-  if (!/^[A-Z]$/.test(key)) return; // ignore non‑letters
+  if (!/^[A-Z]$/.test(key)) return;
 
-  if (typedChars.length >= accessWord.length) return; // prevent overflow
+  // If full length reached, ignore anything extra
+  if (typedChars.length >= accessWord.length) return;
 
   const expectedChar = accessWord[typedChars.length];
-  if (key !== expectedChar) return; // wrong letter => ignore
 
-  // Correct letter
+  if (key !== expectedChar) {
+    pendingInvalid++;                 // mark as stray
+    return;
+  }
+
+  /* ---- correct letter ---- */
+  pendingInvalid = 0;                 // reset stray count
   typedChars += key;
 
   const target = Array.from(spanElems).find(
     (span) => span.dataset.char?.toUpperCase() === expectedChar && span.dataset.glitchKey !== "typed"
   );
-
   if (target) {
     target.textContent = expectedChar;
     target.style.color = "#0f0";
     target.dataset.glitchKey = "typed";
+    typedHistory.push(target);
   }
 });
 
